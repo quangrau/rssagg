@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 type apiConfig struct {
@@ -35,9 +36,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	db := database.New(conn)
 	apiCfg := apiConfig{
-		DB: database.New(conn),
+		DB: db,
 	}
+
+	go runScraperWorker(db, 10, time.Minute)
 
 	// Router configs
 	router := chi.NewRouter()
